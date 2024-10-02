@@ -1,0 +1,19 @@
+program   =  { SOI ~ top_level* ~ EOI }
+top_level =  { func | struct | wsp }
+func      =  { "fn" ~ wsp* ~ id ~ "(" ~ ")" ~ wsp* ~ "->" ~ wsp* ~ type ~ wsp* ~ "{" ~ wsp* ~ stmt* ~ wsp* ~ "}" }
+struct    =  { id ~ wsp* ~ ":" ~ wsp* ~ type ~ ("," ~ id ~ ":" ~ type)* ~ ","? }
+type      =  { "i32" | "u8" | "char" | "bool" | "string" | id }
+alpha     =  { 'a'..'z' | 'A'..'Z' }
+digit     =  { '0'..'9' }
+stmt      =  { expr ~ wsp* ~ ";" }
+expr      =  {
+  | num ~ wsp* ~ "+" ~ wsp* ~ num
+  | id
+  | digit
+}
+id        = @{ alpha ~ (alpha | digit)* }
+wsp       = _{ " " | "\t" | "\r" | "\n" }
+num       = @{ digit* }
+// field = { (ASCII_DIGIT | "." | "-")+ }
+// record = { field ~ ("," ~ field)* }
+// file = { SOI ~ (record ~ ("\r\n" | "\n"))* ~ EOI }
