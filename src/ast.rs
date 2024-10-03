@@ -65,5 +65,5 @@ pub enum TopLevel {
         Type,   // Type
     ),
     Import(String),
-    Const(String, Type, Expr),8
+    Const(String, Type, Expr),
 }
