@@ -1,5 +1,5 @@
 mod clank_parser;
-use clank_parser;
+
 use std::fs;
 
 fn main() {

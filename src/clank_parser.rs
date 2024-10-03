@@ -6,7 +6,7 @@ use pest_derive::Parser;
 pub struct CSVParser;
 
 pub fn parse_clank(input: String) {
-    let file = CSVParser::parse(Rule::program, &unparsed_file)
+    let file = CSVParser::parse(Rule::program, &input)
         .expect("Unsuccessful parse")
         .next()
         .unwrap();
@@ -46,5 +46,3 @@ pub fn parse_clank(input: String) {
     // println!("Sum of fields: {}", field_sum);
     // println!("Number of records: {}", record_count);
 }
-
-export parse_clank;
