@@ -2,7 +2,7 @@ use pest::Parser;
 use pest_derive::Parser;
 
 #[derive(Parser)]
-#[grammar = "csv.pest"]
+#[grammar = "clank_grammar.pest"]
 pub struct CSVParser;
 
 pub fn parse_clank(input: String) {
