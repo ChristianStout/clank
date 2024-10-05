@@ -24,10 +24,7 @@ stmt    := <expr> ;
          | let <id> (: <type>)? ( = <expr> )? ;
          | when <expr> { <stmt>* }
          | match <expr> { <mtcitm> (, <mtcitm>)* [,]? }
-expr    := <num>
-         | <id>
-         | <str>
-         | <expr> + <expr>
+expr    := <expr> + <expr>
          | <expr> - <expr>
          | <expr> [*] <expr>
          | <expr> \ <expr>
@@ -47,6 +44,8 @@ expr    := <num>
          | + <expr>
          | true
          | false
+         | <id>
+         | <num>
          | <str>
          | <chr>
          | <expr> . <id>
