@@ -36,6 +36,10 @@ expr    := <num>
          | <expr> %= <expr>
          | <expr> == <expr>
          | <expr> != <expr>
+         | <expr> > <expr>
+         | <expr> < <expr>
+         | <expr> >= <expr>
+         | <expr> <= <expr>
          | - <expr>
          | + <expr>
          | true
