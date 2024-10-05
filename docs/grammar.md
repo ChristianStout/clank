@@ -4,12 +4,14 @@ S       := <import>
          | <const>
          | <func>
          | <struct>
+         | <enum>
          | <impl>
          | <trait>
 import  := import <id> (::<id>)* ;
 const   := const <id> : <type> = <expr>
 func    := fn <id> ( <params>? ) -> <type> { <stmt>* }
 struct  := struct <id> { <objdef> }
+enum    := enum <id> { <enmitm> (, <enmitm>)* [,]? }
 impl    := impl <id>  (for <id>)? { <stmt> }
 params  := <id> : <type> (, <params>)?
 objdef  := <id> : <type> (, <objdef>)?
@@ -21,6 +23,7 @@ stmt    := <expr> ;
          | while <expr> { <stmt> }
          | let <id> (: <type>)? ( = <expr> )? ;
          | when <expr> { <stmt>* }
+         | match <expr> { <mtcitm> (, <mtcitm>)* [,]? }
 expr    := <num>
          | <id>
          | <str>
@@ -55,6 +58,8 @@ type    := i32
          | <id>
          | <id> [<] <type> [>]
          | \[ <type> \]
+enmitm  := <id> ( [(] <type> (, <type>)? [,]? [)] )?
+mtcitm  := <expr> => { <stmt>* }
 id      := [a-zA-Z_][a-zA-Z0-9_]*
 num     := [0-9]+([.][0-9]+)?
 str     := ".*"
