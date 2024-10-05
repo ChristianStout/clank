@@ -6,7 +6,10 @@ structbd   =  { id ~ WHITESPACE+ ~ ":" ~ type ~ ("," ~ id ~ ":" ~ type)* ~ ","? 
 type       =  { "i32" | "u8" | "char" | "bool" | "string" | id }
 alpha      =  { 'a'..'z' | 'A'..'Z' | "_" }
 digit      =  { '0'..'9' }
-stmt       =  { expr ~ ";" }
+stmt       =  {
+    expr ~ ";"
+  | "return" ~ expr ~ ";"
+}
 expr       =  {
     num ~ "+" ~ num
   | num ~ "-" ~ num
@@ -29,8 +32,9 @@ expr       =  {
   | digit
 }
 id         = @{ alpha ~ (alpha | digit)* }
-WHITESPACE = _{ (" " | "\t" | "\r" | "\n") }
 num        = @{ digit* }
+WHITESPACE = _{ (" " | "\t" | "\r" | "\n") }
+COMMENT    = _{ ("//" ~ ^"\n"* ~ "\n") | ("/*" ~ ANY* ~ "*/") }
 // field = { (ASCII_DIGIT | "." | "-")+ }
 // record = { field ~ ("," ~ field)* }
 // file = { SOI ~ (record ~ ("\r\n" | "\n"))* ~ EOI }
