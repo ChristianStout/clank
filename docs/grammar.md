@@ -53,6 +53,7 @@ expr    := <num>
          | <id> :: <expr>
          | <expr> as <type>
 type    := i32
+         | u8
          | string
          | char
          | bool
