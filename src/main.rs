@@ -1,3 +1,4 @@
+mod ast;
 mod clank_parser;
 
 use std::fs;

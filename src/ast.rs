@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 pub enum Type {
     I32,
     U8,
@@ -5,65 +6,67 @@ pub enum Type {
     String,
     Bool,
     Custom(String),
-    Fn(Vec<Type>, Type),
-    // Generic(String, Vec<Type>),
+    Fn(Vec<Type>, Box<Type>),
 }
 
+#[allow(dead_code)]
 pub enum Stmt {
     Let(
         String, // Id
-        Optional<Type>,
-        Optional<Expr>,
+        Option<Type>,
+        Option<Expr>,
     ),
     For(
-        Expr,      // Var
-        Expr,      // Iterable
+        Box<Expr>, // Var
+        Box<Expr>, // Iterable
         Vec<Stmt>, // Block
     ),
     While(
-        Expr,      // Boolean
+        Box<Expr>, // Boolean
         Vec<Stmt>, // Block
     ),
-    Expr(Expr),
+    Expr(Box<Expr>),
     If(
-        Expr,      // Boolean
+        Box<Expr>, // Boolean
         Vec<Stmt>, // Block
     ),
-    Else(Vec<Stmt>), // I'm tempted to remove this 🤔
-    Return(Expr),
+    Else(Vec<Box<Stmt>>), // I'm tempted to remove this 🤔
+    Return(Box<Expr>),
 }
 
+#[allow(dead_code)]
 pub enum Expr {
     Id(String),
     Num(i32),
     Str(String),
     Chr(char),
-    Add(Expr, Expr),
-    Sub(Expr, Expr),
-    Mul(Expr, Expr),
-    Div(Expr, Expr),
-    Mod(Expr, Expr),
-    UnaryPos(Expr),
-    UnaryNeg(Expr),
+    Add(Box<Expr>, Box<Expr>),
+    Sub(Box<Expr>, Box<Expr>),
+    Mul(Box<Expr>, Box<Expr>),
+    Div(Box<Expr>, Box<Expr>),
+    Mod(Box<Expr>, Box<Expr>),
+    UnaryPos(Box<Expr>),
+    UnaryNeg(Box<Expr>),
     True,
     False,
 }
 
+#[allow(dead_code)]
 pub enum TopLevel {
     Fn(
         String,              // Id
         Vec<(String, Type)>, // Params
-        Type,                // Type
-        Vec<Stmt>,           // Stmt(s)
+        Box<Type>,           // Type
+        Vec<Box<Stmt>>,      // Stmt(s)
     ),
     Struct(
-        String,            // Id
-        Vec<String, Type>, // StructItem
+        String,              // Id
+        Vec<(String, Type)>, // StructItem
     ),
     StructItem(
-        String, // Id
-        Type,   // Type
+        String,    // Id
+        Box<Type>, // Type
     ),
     Import(String),
-    Const(String, Type, Expr),
+    Const(String, Box<Type>, Box<Expr>),
 }

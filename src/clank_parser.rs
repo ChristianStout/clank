@@ -1,3 +1,4 @@
+use crate::ast::*;
 use pest::Parser;
 use pest_derive::Parser;
 
@@ -5,13 +6,17 @@ use pest_derive::Parser;
 #[grammar = "clank_grammar.pest"]
 pub struct CSVParser;
 
-pub fn parse_clank(input: String) {
+pub fn parse_clank(input: String) -> Vec<TopLevel> {
     let file = CSVParser::parse(Rule::program, &input)
         .expect("Unsuccessful parse")
         .next()
         .unwrap();
 
-    println!("{}", file.into_inner())
+    let mut top = vec![];
+
+    println!("{}", file.clone().into_inner());
+
+    return top;
 
     // let mut i = 0;
 
