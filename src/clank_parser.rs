@@ -20,7 +20,8 @@ pub fn parse_clank(input: String) -> Vec<TopLevel> {
         match node.as_rule() {
             Rule::func => {}
             Rule::r#struct => {}
-            _ => unreachable!(),
+            Rule::EOI => {}
+            _ => {}
         }
     }
 
