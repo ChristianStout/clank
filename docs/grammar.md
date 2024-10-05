@@ -51,6 +51,7 @@ expr    := <num>
          | <chr>
          | <expr> . <id>
          | <id> :: <id>
+         | <expr> as <type>
 type    := i32
          | string
          | char
