@@ -53,6 +53,7 @@ expr    := <expr> + <expr>
          | <expr> . <id>
          | <id> :: <expr>
          | <id> :: <id>
+         | <id> ( <args>? )
          | <expr> as <type>
 type    := i32
          | u8
