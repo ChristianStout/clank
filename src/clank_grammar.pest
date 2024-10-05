@@ -1,36 +1,36 @@
-program   =  { SOI ~ top_level* ~ EOI }
-top_level =  { func | struct | wsp }
-func      =  { "fn" ~ wsp+ ~ id ~ "(" ~ ")" ~ wsp* ~ "->" ~ wsp* ~ type ~ wsp* ~ "{" ~ wsp* ~ stmt* ~ wsp* ~ "}" }
-struct    =  { "struct" ~ wsp+ ~ id ~ wsp* ~ "{" ~ wsp* ~ structbd ~ wsp* ~ "}" }
-structbd  =  { id ~ wsp+ ~ ":" ~ wsp* ~ type ~ wsp* ~ ("," ~ id ~ ":" ~ type)* ~ ","? }
-type      =  { "i32" | "u8" | "char" | "bool" | "string" | id }
-alpha     =  { 'a'..'z' | 'A'..'Z' | "_" }
-digit     =  { '0'..'9' }
-stmt      =  { expr ~ wsp ~ ";" }
-expr      =  {
-    num ~ wsp* ~ "+" ~ wsp* ~ num
-  | num ~ wsp* ~ "-" ~ wsp* ~ num
-  | num ~ wsp* ~ "*" ~ wsp* ~ num
-  | num ~ wsp* ~ "/" ~ wsp* ~ num
-  | num ~ wsp* ~ "%" ~ wsp* ~ num
-  | num ~ wsp* ~ "+=" ~ wsp* ~ num
-  | num ~ wsp* ~ "-=" ~ wsp* ~ num
-  | num ~ wsp* ~ "*=" ~ wsp* ~ num
-  | num ~ wsp* ~ "/=" ~ wsp* ~ num
-  | num ~ wsp* ~ "%=" ~ wsp* ~ num
-  | num ~ wsp* ~ "==" ~ wsp* ~ num
-  | num ~ wsp* ~ "!=" ~ wsp* ~ num
-  | num ~ wsp* ~ ">" ~ wsp* ~ num
-  | num ~ wsp* ~ "<" ~ wsp* ~ num
-  | num ~ wsp* ~ ">=" ~ wsp* ~ num
-  | num ~ wsp* ~ "<=" ~ wsp* ~ num
-  | num ~ wsp* ~ "=" ~ wsp* ~ num
+program    =  { SOI ~ top_level* ~ EOI }
+top_level  =  { func | struct }
+func       =  { "fn" ~ id ~ "(" ~ ")" ~ "->" ~ type ~ "{" ~ stmt* ~ "}" }
+struct     =  { "struct" ~ WHITESPACE+ ~ id ~ "{" ~ structbd ~ "}" }
+structbd   =  { id ~ WHITESPACE+ ~ ":" ~ type ~ ("," ~ id ~ ":" ~ type)* ~ ","? }
+type       =  { "i32" | "u8" | "char" | "bool" | "string" | id }
+alpha      =  { 'a'..'z' | 'A'..'Z' | "_" }
+digit      =  { '0'..'9' }
+stmt       =  { expr ~ ";" }
+expr       =  {
+    num ~ "+" ~ num
+  | num ~ "-" ~ num
+  | num ~ "*" ~ num
+  | num ~ "/" ~ num
+  | num ~ "%" ~ num
+  | num ~ "+=" ~ num
+  | num ~ "-=" ~ num
+  | num ~ "*=" ~ num
+  | num ~ "/=" ~ num
+  | num ~ "%=" ~ num
+  | num ~ "==" ~ num
+  | num ~ "!=" ~ num
+  | num ~ ">" ~ num
+  | num ~ "<" ~ num
+  | num ~ ">=" ~ num
+  | num ~ "<=" ~ num
+  | num ~ "=" ~ num
   | id
   | digit
 }
-id        = @{ alpha ~ (alpha | digit)* }
-wsp       = _{ (" " | "\t" | "\r" | "\n") }
-num       = @{ digit* }
+id         = @{ alpha ~ (alpha | digit)* }
+WHITESPACE = _{ (" " | "\t" | "\r" | "\n") }
+num        = @{ digit* }
 // field = { (ASCII_DIGIT | "." | "-")+ }
 // record = { field ~ ("," ~ field)* }
 // file = { SOI ~ (record ~ ("\r\n" | "\n"))* ~ EOI }
