@@ -4,10 +4,10 @@ use pest_derive::Parser;
 
 #[derive(Parser)]
 #[grammar = "clank_grammar.pest"]
-pub struct CSVParser;
+pub struct ClankParser;
 
 pub fn parse_clank(input: String) -> Vec<TopLevel> {
-    let file = CSVParser::parse(Rule::program, &input)
+    let file = ClankParser::parse(Rule::program, &input)
         .expect("Unsuccessful parse")
         .next()
         .unwrap();
@@ -15,6 +15,14 @@ pub fn parse_clank(input: String) -> Vec<TopLevel> {
     let mut top = vec![];
 
     println!("{}", file.clone().into_inner());
+
+    for node in file.into_inner() {
+        match node.as_rule() {
+            Rule::func => {}
+            Rule::r#struct => {}
+            _ => unreachable!(),
+        }
+    }
 
     return top;
 
