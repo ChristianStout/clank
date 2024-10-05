@@ -12,7 +12,7 @@ pub fn parse_clank(input: String) -> Vec<TopLevel> {
         .next()
         .unwrap();
 
-    let mut top = vec![];
+    let top = vec![];
 
     println!("{}", file.clone().into_inner());
 
