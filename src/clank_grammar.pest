@@ -1,18 +1,35 @@
 program   =  { SOI ~ top_level* ~ EOI }
 top_level =  { func | struct | wsp }
-func      =  { "fn" ~ wsp* ~ id ~ "(" ~ ")" ~ wsp* ~ "->" ~ wsp* ~ type ~ wsp* ~ "{" ~ wsp* ~ stmt* ~ wsp* ~ "}" }
-struct    =  { id ~ wsp* ~ ":" ~ wsp* ~ type ~ ("," ~ id ~ ":" ~ type)* ~ ","? }
+func      =  { "fn" ~ wsp+ ~ id ~ "(" ~ ")" ~ wsp* ~ "->" ~ wsp* ~ type ~ wsp* ~ "{" ~ wsp* ~ stmt* ~ wsp* ~ "}" }
+struct    =  { "struct" ~ wsp+ ~ id ~ wsp* ~ "{" ~ wsp* ~ structbd ~ wsp* ~ "}" }
+structbd  =  { id ~ wsp+ ~ ":" ~ wsp* ~ type ~ wsp* ~ ("," ~ id ~ ":" ~ type)* ~ ","? }
 type      =  { "i32" | "u8" | "char" | "bool" | "string" | id }
-alpha     =  { 'a'..'z' | 'A'..'Z' }
+alpha     =  { 'a'..'z' | 'A'..'Z' | "_" }
 digit     =  { '0'..'9' }
-stmt      =  { expr ~ wsp* ~ ";" }
+stmt      =  { expr ~ wsp ~ ";" }
 expr      =  {
-  | num ~ wsp* ~ "+" ~ wsp* ~ num
+    num ~ wsp* ~ "+" ~ wsp* ~ num
+  | num ~ wsp* ~ "-" ~ wsp* ~ num
+  | num ~ wsp* ~ "*" ~ wsp* ~ num
+  | num ~ wsp* ~ "/" ~ wsp* ~ num
+  | num ~ wsp* ~ "%" ~ wsp* ~ num
+  | num ~ wsp* ~ "+=" ~ wsp* ~ num
+  | num ~ wsp* ~ "-=" ~ wsp* ~ num
+  | num ~ wsp* ~ "*=" ~ wsp* ~ num
+  | num ~ wsp* ~ "/=" ~ wsp* ~ num
+  | num ~ wsp* ~ "%=" ~ wsp* ~ num
+  | num ~ wsp* ~ "==" ~ wsp* ~ num
+  | num ~ wsp* ~ "!=" ~ wsp* ~ num
+  | num ~ wsp* ~ ">" ~ wsp* ~ num
+  | num ~ wsp* ~ "<" ~ wsp* ~ num
+  | num ~ wsp* ~ ">=" ~ wsp* ~ num
+  | num ~ wsp* ~ "<=" ~ wsp* ~ num
+  | num ~ wsp* ~ "=" ~ wsp* ~ num
   | id
   | digit
 }
 id        = @{ alpha ~ (alpha | digit)* }
-wsp       = _{ " " | "\t" | "\r" | "\n" }
+wsp       = _{ (" " | "\t" | "\r" | "\n") }
 num       = @{ digit* }
 // field = { (ASCII_DIGIT | "." | "-")+ }
 // record = { field ~ ("," ~ field)* }
