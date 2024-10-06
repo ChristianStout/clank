@@ -7,16 +7,14 @@ S       := <import>
          | <enum>
          | <impl>
          | <trait>
-import  := import <id> (::<id>)* ;
+import  := import <id> (::<id>)* (as <id>)? ;
 const   := const <id> : <type> = <expr> ;
 func    := fn <id> ( <params>? ) -> <type> { <stmt>* }
 struct  := struct <id> { <objdef> }
 enum    := enum <id> { <enmitm> (, <enmitm>)* [,]? }
-impl    := impl <id>  (for <id>)? { <stmt>* }
-impl    := impl <id>  (for <id>)? { <stmt> }
+impl    := impl <id>  (for <id>)? { <func>* }
 params  := <id> : <type> (, <params>)?
 objdef  := <id> : <type> (, <objdef>)?
-args    := ( <expr> (, <expr>)* )?
 stmt    := <expr> ;
          | if ( <expr> ) { <stmt>* }
          | else { <stmt>* }
@@ -29,12 +27,12 @@ stmt    := <expr> ;
 expr    := <expr> + <expr>
          | <expr> - <expr>
          | <expr> [*] <expr>
-         | <expr> \ <expr>
+         | <expr> / <expr>
          | <expr> % <expr>
          | <expr> += <expr>
          | <expr> -= <expr>
          | <expr> [*]= <expr>
-         | <expr> \= <expr>
+         | <expr> /= <expr>
          | <expr> %= <expr>
          | <expr> == <expr>
          | <expr> != <expr>
@@ -42,19 +40,23 @@ expr    := <expr> + <expr>
          | <expr> < <expr>
          | <expr> >= <expr>
          | <expr> <= <expr>
+         | <expr> = <expr>
          | - <expr>
          | + <expr>
+         | ! <expr>
          | true
          | false
          | <id>
          | <num>
          | <str>
          | <chr>
-         | <expr> . <id>
-         | <id> :: <expr>
-         | <id> :: <id>
-         | <id> ( <args>? )
+         | <expr> . <expr>
+         | <expr> :: <expr>
+         | <expr> ( (<expr> (, <expr>)* )? )
          | <expr> as <type>
+         | ( <expr> )
+         | lambda <params>? : (<expr> | { <stmt>* })
+         | <expr> .. <expr>
 type    := i32
          | u8
          | string
@@ -63,6 +65,7 @@ type    := i32
          | <id>
          | <id> [<] <type> [>]
          | \[ <type> \]
+         | ( <type>? (, <type>)* ) -> <type>
 enmitm  := <id> ( [(] <type> (, <type>)? [,]? [)] )?
 mtcitm  := <expr> => { <stmt>* }
 id      := [a-zA-Z_][a-zA-Z0-9_]*
