@@ -2,53 +2,79 @@
 pub enum Type {
     I32,
     U8,
-    Char,
     String,
+    Char,
     Bool,
-    Custom(String),
+    Array(Box<Type>),
+    Custom(Box<Type>),
     Fn(Vec<Type>, Box<Type>),
 }
 
 #[allow(dead_code)]
 pub enum Stmt {
-    Let(
-        String, // Id
-        Option<Type>,
-        Option<Expr>,
-    ),
-    For(
-        Box<Expr>, // Var
-        Box<Expr>, // Iterable
-        Vec<Stmt>, // Block
-    ),
-    While(
-        Box<Expr>, // Boolean
-        Vec<Stmt>, // Block
-    ),
     Expr(Box<Expr>),
     If(
         Box<Expr>, // Boolean
         Vec<Stmt>, // Block
     ),
     Else(Vec<Box<Stmt>>), // I'm tempted to remove this 🤔
+    For(
+        Box<Expr>, // Var
+        Box<Expr>, // Iterable
+        Vec<Stmt>, // Block
+    ),
+    While(
+        Box<Expr>, //Expr
+        Vec<Stmt>, // Block
+    ),
+    Let(
+        String, // Id
+        Option<Type>,
+        Option<Expr>,
+    ),
+    When(
+        Box<Expr>, // Boolean expression with var
+        Vec<Stmt>, // Block
+    ),
+    // Match(Box<Expr>, Vec<MatchItem>)
     Return(Box<Expr>),
 }
 
 #[allow(dead_code)]
 pub enum Expr {
-    Id(String),
-    Num(i32),
-    Str(String),
-    Chr(char),
     Add(Box<Expr>, Box<Expr>),
     Sub(Box<Expr>, Box<Expr>),
     Mul(Box<Expr>, Box<Expr>),
     Div(Box<Expr>, Box<Expr>),
     Mod(Box<Expr>, Box<Expr>),
+    PlusEqual(Box<Expr>, Box<Expr>),
+    MinusEqual(Box<Expr>, Box<Expr>),
+    DivEqual(Box<Expr>, Box<Expr>),
+    MulEqual(Box<Expr>, Box<Expr>),
+    ModEqual(Box<Expr>, Box<Expr>),
+    Gt(Box<Expr>, Box<Expr>),
+    Lt(Box<Expr>, Box<Expr>),
+    GtEqual(Box<Expr>, Box<Expr>),
+    LtEqual(Box<Expr>, Box<Expr>),
+    Equal(Box<Expr>, Box<Expr>),
+    NotEqual(Box<Expr>, Box<Expr>),
+    Assign(Box<Expr>, Box<Expr>),
     UnaryPos(Box<Expr>),
     UnaryNeg(Box<Expr>),
+    Not(Box<Expr>),
     True,
     False,
+    Id(String),
+    Num(i32),
+    Str(String),
+    Chr(char),
+    RefAccess(Box<Expr>, Box<Expr>),
+    NamespaceAccess(Box<Expr>, Box<Expr>),
+    FnCall(Box<Expr>, Vec<Expr>),
+    Cast(Box<Expr>, Box<Type>),
+    ParenExpr(Box<Expr>),
+    Lambda(Vec<(String, Optional<Type>)>, Vec<Stmt>),
+    Range(Box<Expr>, Box<Expr>),
 }
 
 #[allow(dead_code)]
