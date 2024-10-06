@@ -73,7 +73,7 @@ pub enum Expr {
     FnCall(Box<Expr>, Vec<Expr>),
     Cast(Box<Expr>, Box<Type>),
     ParenExpr(Box<Expr>),
-    Lambda(Vec<(String, Optional<Type>)>, Vec<Stmt>),
+    Lambda(Vec<(String, Option<Type>)>, Vec<Stmt>),
     Range(Box<Expr>, Box<Expr>),
 }
 
