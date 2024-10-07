@@ -1,10 +1,58 @@
 use crate::ast::*;
+use pest::iterators::Pairs;
 use pest::Parser;
 use pest_derive::Parser;
 
 #[derive(Parser)]
 #[grammar = "clank_grammar.pest"]
-pub struct ClankParser;
+pub struct ClankParser {
+    pub tree: Vec<TopLevel>,
+}
+
+impl ClankParser {
+    pub fn new() -> ClankParser {
+        ClankParser { tree: Vec::new() }
+    }
+
+    pub fn build_tree_parse(&mut self, file: Pairs<'_, Rule>) {
+        for top_level in file.into_iter() {
+            match top_level.as_rule() {
+                Rule::func => {
+                    println!("IN build_tree_parse=>func");
+                    let f = self.parse_fn(top_level.into_inner());
+                    self.tree.push(f);
+                }
+                Rule::r#struct => {
+                    println!("IN build_tree_parse=>struct");
+                    let f = self.parse_struct(top_level.into_inner());
+                    self.tree.push(f)
+                }
+                Rule::EOI => {
+                    println!("IN build_tree_parse=>EOI");
+                }
+                _ => {
+                    println!("IN build_tree_parse=>other");
+                }
+            }
+        }
+    }
+
+    pub fn parse_fn(&mut self, _f: Pairs<'_, Rule>) -> TopLevel {
+        return TopLevel::Const(
+            String::from("from parse_fn"),
+            Box::new(Type::I32),
+            Box::new(Expr::False),
+        );
+    }
+
+    pub fn parse_struct(&mut self, _f: Pairs<'_, Rule>) -> TopLevel {
+        return TopLevel::Const(
+            String::from("from parse_struct"),
+            Box::new(Type::I32),
+            Box::new(Expr::False),
+        );
+    }
+}
 
 pub fn parse_clank(input: String) -> Vec<TopLevel> {
     let file = ClankParser::parse(Rule::program, &input)
@@ -12,20 +60,22 @@ pub fn parse_clank(input: String) -> Vec<TopLevel> {
         .next()
         .unwrap();
 
-    let top = vec![];
-
+    let mut clank_parser = ClankParser::new();
     println!("{}", file.clone().into_inner());
+    clank_parser.build_tree_parse(file.into_inner());
 
-    for node in file.into_inner() {
-        match node.as_rule() {
-            Rule::func => {}
-            Rule::r#struct => {}
-            Rule::EOI => {}
-            _ => {}
-        }
-    }
+    // for top_level in file.into_inner() {
+    //     match top_level.as_rule() {
+    //         Rule::func => {}
+    //         Rule::r#struct => {}
+    //         Rule::EOI => {}
+    //         _ => {}
+    //     }
+    // }
 
-    return top;
+    // clank_parser.build_tree_parse(file.into_inner());
+
+    return clank_parser.tree;
 
     // let mut i = 0;
 

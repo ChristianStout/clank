@@ -1,4 +1,4 @@
-fn some() -> i32 {
-    10 + 299 ;
-    return x;
+
+fn main() -> i32 {
+    return 0;
 }
