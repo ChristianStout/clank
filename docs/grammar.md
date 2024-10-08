@@ -42,6 +42,8 @@ expr    := <expr> + <expr>
          | <expr> < <expr>
          | <expr> >= <expr>
          | <expr> <= <expr>
+         | <expr> && <expr>
+         | <expr> || <expr>
          | - <expr>
          | + <expr>
          | true
