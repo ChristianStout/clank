@@ -1,8 +1,8 @@
 program    =  { SOI ~ top_level* ~ EOI }
 top_level  =  { func | struct }
 func       =  { "fn " ~ id ~ "(" ~ ")" ~ "->" ~ type ~ "{" ~ stmt* ~ "}" }
-struct     =  { "struct " ~ WHITESPACE+ ~ id ~ "{" ~ structbd ~ "}" }
-structbd   =  { id ~ WHITESPACE+ ~ ":" ~ type ~ ("," ~ id ~ ":" ~ type)* ~ ","? }
+struct     =  { "struct " ~ id ~ "{" ~ structbd? ~ "}" }
+structbd   =  { id ~ ":" ~ type ~ ("," ~ id ~ ":" ~ type)* ~ ","? }
 type       =  { "i32" | "u8" | "char" | "bool" | "string" | id }
 alpha      =  { 'a'..'z' | 'A'..'Z' | "_" }
 digit      =  { '0'..'9' }
