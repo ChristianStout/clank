@@ -1,3 +1,5 @@
+use std::os;
+
 use crate::ast::*;
 use pest::iterators::Pairs;
 use pest::Parser;
@@ -24,6 +26,10 @@ impl ClankParser {
                     }
                     Rule::r#struct => {
                         let s = self.parse_struct(item.into_inner());
+                        self.tree.push(s);
+                    }
+                    Rule::r#const => {
+                        let c = self.parse_const(item.into_inner());
                         self.tree.push(s);
                     }
                     _ => {
@@ -57,6 +63,14 @@ impl ClankParser {
             Box::new(Type::I32),
             Box::new(Expr::False),
         );
+    }
+
+    pub fn parse_const(&mut self, f: Pairs<'_, Rule>) -> TopLevel {
+
+    }
+
+    pub fn get_rules() {
+
     }
 
     pub fn get_type(&self, s: &str) -> Type {
