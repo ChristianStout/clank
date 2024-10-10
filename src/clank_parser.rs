@@ -35,10 +35,19 @@ impl ClankParser {
     }
 
     pub fn parse_fn(&mut self, _f: Pairs<'_, Rule>) -> TopLevel {
-        return TopLevel::Const(
-            String::from("from parse_fn"),
-            Box::new(Type::I32),
-            Box::new(Expr::False),
+        let pairs: Vec<Rule> = _f.into_iter().collect();
+
+        let name: String;
+        let params: Vec<(String, Type)>;
+        let box_type: Box<Type>;
+        let stmts: Vec<Stmt>;
+
+        for (i, item) in _f.into_iter().enumerate() {}
+        return TopLevel::Fn(
+            (),
+            (),
+            (),
+            ()
         );
     }
 
@@ -48,6 +57,17 @@ impl ClankParser {
             Box::new(Type::I32),
             Box::new(Expr::False),
         );
+    }
+
+    pub fn get_type(&self, s: &str) -> Type {
+        match s {
+            "i32" => Type::I32,
+            "u8" => Type::U8,
+            "string" => Type::String,
+            "char" => Type::Char,
+            "bool" => Type::Bool,
+            _ => Type::Custom(s.to_string()) // TODO: add Array() and Fn()
+        }
     }
 }
 

@@ -7,7 +7,7 @@ pub enum Type {
     Char,
     Bool,
     Array(Box<Type>),
-    Custom(Box<Type>),
+    Custom(String),
     Fn(Vec<Type>, Box<Type>),
 }
 
@@ -87,7 +87,7 @@ pub enum TopLevel {
         String,              // Id
         Vec<(String, Type)>, // Params
         Box<Type>,           // Type
-        Vec<Box<Stmt>>,      // Stmt(s)
+        Vec<Stmt>,           // Stmt(s)
     ),
     Struct(
         String,              // Id
@@ -98,5 +98,9 @@ pub enum TopLevel {
         Box<Type>, // Type
     ),
     Import(String),
-    Const(String, Box<Type>, Box<Expr>),
+    Const(
+        String,
+        Box<Type>,
+        Box<Expr>,
+    ),
 }
