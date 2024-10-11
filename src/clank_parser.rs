@@ -1,7 +1,5 @@
-use std::os;
-
 use crate::ast::*;
-use pest::iterators::Pairs;
+use pest::iterators::{Pair, Pairs};
 use pest::Parser;
 use pest_derive::Parser;
 
@@ -30,7 +28,7 @@ impl ClankParser {
                     }
                     Rule::r#const => {
                         let c = self.parse_const(item.into_inner());
-                        self.tree.push(s);
+                        self.tree.push(c);
                     }
                     _ => {
                         unreachable!();
@@ -40,24 +38,21 @@ impl ClankParser {
         }
     }
 
-    pub fn parse_fn(&mut self, _f: Pairs<'_, Rule>) -> TopLevel {
-        let pairs: Vec<Rule> = _f.into_iter().collect();
+    pub fn parse_fn(&mut self, _p: Pairs<'_, Rule>) -> TopLevel {
+        // let pairs: Vec<Rule> = _f.into_iter().collect();
 
-        let name: String;
-        let params: Vec<(String, Type)>;
-        let box_type: Box<Type>;
-        let stmts: Vec<Stmt>;
+        // let name: String;
+        // let params: Vec<(String, Type)>;
+        // let box_type: Box<Type>;
+        // let stmts: Vec<Stmt>;
 
-        for (i, item) in _f.into_iter().enumerate() {}
-        return TopLevel::Fn(
-            (),
-            (),
-            (),
-            ()
-        );
-    }
-
-    pub fn parse_struct(&mut self, _f: Pairs<'_, Rule>) -> TopLevel {
+        // for (i, item) in _f.into_iter().enumerate() {}
+        // return TopLevel::Fn(
+        //     (),
+        //     (),
+        //     (),
+        //     ()
+        // );
         return TopLevel::Const(
             String::from("from parse_struct"),
             Box::new(Type::I32),
@@ -65,13 +60,44 @@ impl ClankParser {
         );
     }
 
-    pub fn parse_const(&mut self, f: Pairs<'_, Rule>) -> TopLevel {
-
+    pub fn parse_struct(&mut self, _p: Pairs<'_, Rule>) -> TopLevel {
+        return TopLevel::Const(
+            String::from("from parse_struct"),
+            Box::new(Type::I32),
+            Box::new(Expr::False),
+        );
     }
 
-    pub fn get_rules() {
+    pub fn parse_const(&mut self, p: Pairs<'_, Rule>) -> TopLevel {
+        let mut pairs: Vec<Pair<'_, Rule>> = p.collect();
 
+        let id = pairs[0].as_str().to_string();
+        let t = Box::new(self.get_type(pairs[1].as_str()));
+        let expr = Box::new(self.parse_expr(pairs
+            .pop()
+            .expect("Somehow, the const was empty")
+            .into_inner())
+        );
+
+        return TopLevel::Const(id, t, expr);
     }
+
+    pub fn parse_expr(&self, p: Pairs<'_, Rule>) -> Expr {
+        let mut expr: Expr = Expr::False;
+        for pair in p.into_iter() {
+            match pair.as_rule() {
+                Rule::id => { expr = Expr::Id(pair.as_str().to_string()) },
+                Rule::num => { expr = Expr::Num(pair.as_str().parse::<i32>().expect("Somehow, a number was parsed, but it isn't a number")) }
+                _ => unreachable!()
+            }
+        }
+
+        return expr;
+    }
+
+    // pub fn get_rules() {
+
+    // }
 
     pub fn get_type(&self, s: &str) -> Type {
         match s {
@@ -83,6 +109,16 @@ impl ClankParser {
             _ => Type::Custom(s.to_string()) // TODO: add Array() and Fn()
         }
     }
+
+    // pub fn get_pair_vec(&self, pairs: Pairs<'_, Rule>) -> Vec<Pair<'_, Rule>> {
+    //     let mut v = vec![];
+    //     for pair in pairs.into_iter() {
+    //         v.push(pair);
+    //     }
+    //     return v;
+    // }
+
+    // pub fn get_id(&self, )
 }
 
 pub fn parse_clank(input: String) -> Vec<TopLevel> {
