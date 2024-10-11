@@ -88,6 +88,20 @@ impl ClankParser {
             match pair.as_rule() {
                 Rule::id => { expr = Expr::Id(pair.as_str().to_string()) },
                 Rule::num => { expr = Expr::Num(pair.as_str().parse::<i32>().expect("Somehow, a number was parsed, but it isn't a number")) }
+                Rule::string => { expr = Expr::Str(pair.into_inner().next().unwrap().as_str().to_string()) }
+                Rule::char => {
+                    let char_vec: Vec<char> = pair
+                        .into_inner()
+                        .next()
+                        .unwrap()
+                        .as_str()
+                        .chars()
+                        .collect();
+
+                    assert!(char_vec.len() == 1 || char_vec.len() == 2 && char_vec[0] == '\\');
+                    println!("{:?}", char_vec);
+                    expr = Expr::Chr(char_vec[0]);
+                }
                 _ => unreachable!()
             }
         }

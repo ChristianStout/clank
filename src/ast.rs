@@ -19,7 +19,7 @@ pub enum Stmt {
         Box<Expr>, // Boolean
         Vec<Stmt>, // Block
     ),
-    Else(Vec<Box<Stmt>>), // I'm tempted to remove this 🤔
+    Else(Vec<Stmt>), // I'm tempted to remove this 🤔
     For(
         Box<Expr>, // Var
         Box<Expr>, // Iterable
