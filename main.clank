@@ -1,5 +1,7 @@
 
 const PI: i32 = 3;
-const E: i32 = 2;
-const MSG: string = "Do a thing";
-const A: char = 'a';
+
+fn new() -> i32 {
+    "Hello";
+    return 42;
+}

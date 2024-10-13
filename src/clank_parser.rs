@@ -38,26 +38,14 @@ impl ClankParser {
         }
     }
 
-    pub fn parse_fn(&mut self, _p: Pairs<'_, Rule>) -> TopLevel {
-        // let pairs: Vec<Rule> = _f.into_iter().collect();
+    pub fn parse_fn(&mut self, p: Pairs<'_, Rule>) -> TopLevel {
+        let mut pairs: Vec<Pair<'_, Rule>> = p.collect();
 
-        // let name: String;
-        // let params: Vec<(String, Type)>;
-        // let box_type: Box<Type>;
-        // let stmts: Vec<Stmt>;
+        let id = pairs[0].as_str().to_string();
+        let t = Box::new(self.get_type(pairs[1].as_str()));
+        let stmts = self.parse_stmt_many(pairs[2].clone().into_inner()); // TODO: revome clone
 
-        // for (i, item) in _f.into_iter().enumerate() {}
-        // return TopLevel::Fn(
-        //     (),
-        //     (),
-        //     (),
-        //     ()
-        // );
-        return TopLevel::Const(
-            String::from("from parse_struct"),
-            Box::new(Type::I32),
-            Box::new(Expr::False),
-        );
+        return TopLevel::Fn(id, vec![], t, stmts); // TODO: Add parameters
     }
 
     pub fn parse_struct(&mut self, _p: Pairs<'_, Rule>) -> TopLevel {
@@ -73,10 +61,13 @@ impl ClankParser {
 
         let id = pairs[0].as_str().to_string();
         let t = Box::new(self.get_type(pairs[1].as_str()));
-        let expr = Box::new(self.parse_expr(pairs
-            .pop()
-            .expect("Somehow, the const was empty")
-            .into_inner())
+        let expr = Box::new(
+            self.parse_expr(
+                pairs
+                    .pop()
+                    .expect("Somehow, the const was empty")
+                    .into_inner(),
+            ),
         );
 
         return TopLevel::Const(id, t, expr);
@@ -86,32 +77,58 @@ impl ClankParser {
         let mut expr: Expr = Expr::False;
         for pair in p.into_iter() {
             match pair.as_rule() {
-                Rule::id => { expr = Expr::Id(pair.as_str().to_string()) },
-                Rule::num => { expr = Expr::Num(pair.as_str().parse::<i32>().expect("Somehow, a number was parsed, but it isn't a number")) }
-                Rule::string => { expr = Expr::Str(pair.into_inner().next().unwrap().as_str().to_string()) }
+                Rule::id => expr = Expr::Id(pair.as_str().to_string()),
+                Rule::num => {
+                    expr = Expr::Num(
+                        pair.as_str()
+                            .parse::<i32>()
+                            .expect("Somehow, a number was parsed, but it isn't a number"),
+                    )
+                }
+                Rule::string => {
+                    expr = Expr::Str(pair.into_inner().next().unwrap().as_str().to_string())
+                }
                 Rule::char => {
-                    let char_vec: Vec<char> = pair
-                        .into_inner()
-                        .next()
-                        .unwrap()
-                        .as_str()
-                        .chars()
-                        .collect();
+                    let char_vec: Vec<char> =
+                        pair.into_inner().next().unwrap().as_str().chars().collect();
 
                     assert!(char_vec.len() == 1 || char_vec.len() == 2 && char_vec[0] == '\\');
                     println!("{:?}", char_vec);
                     expr = Expr::Chr(char_vec[0]);
                 }
-                _ => unreachable!()
+                Rule::expr => {
+                    return self.parse_expr(pair.into_inner()); // very hacky, make sure to otimize CALLS. Should remove
+                }
+                _ => unreachable!(),
             }
         }
 
         return expr;
     }
 
-    // pub fn get_rules() {
+    pub fn parse_stmt(&self, stmt: Pair<'_, Rule>) -> Stmt {
+        println!("\n\n{:?}", stmt);
+        match stmt.as_rule() {
+            Rule::expr_stmt => {
+                return Stmt::Expr(Box::new(self.parse_expr(stmt.into_inner())));
+            }
+            Rule::ret_stmt => {
+                return Stmt::Return(Box::new(self.parse_expr(stmt.into_inner())));
+            }
+            _ => {}
+        }
+        return Stmt::Expr(Box::new(Expr::False));
+    }
 
-    // }
+    pub fn parse_stmt_many(&self, stmts: Pairs<'_, Rule>) -> Vec<Stmt> {
+        let mut ret_vec: Vec<Stmt> = vec![];
+        for stmt in stmts.into_iter() {
+            ret_vec.push(self.parse_stmt(stmt));
+
+            println!("\n{:?}", ret_vec);
+        }
+        return ret_vec;
+    }
 
     pub fn get_type(&self, s: &str) -> Type {
         match s {
@@ -120,19 +137,9 @@ impl ClankParser {
             "string" => Type::String,
             "char" => Type::Char,
             "bool" => Type::Bool,
-            _ => Type::Custom(s.to_string()) // TODO: add Array() and Fn()
+            _ => Type::Custom(s.to_string()), // TODO: add Array() and Fn()
         }
     }
-
-    // pub fn get_pair_vec(&self, pairs: Pairs<'_, Rule>) -> Vec<Pair<'_, Rule>> {
-    //     let mut v = vec![];
-    //     for pair in pairs.into_iter() {
-    //         v.push(pair);
-    //     }
-    //     return v;
-    // }
-
-    // pub fn get_id(&self, )
 }
 
 pub fn parse_clank(input: String) -> Vec<TopLevel> {

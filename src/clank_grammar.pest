@@ -4,17 +4,20 @@ top_level  =  {
   | struct
   | const
 }
-func       =  { "fn " ~ id ~ "(" ~ ")" ~ "->" ~ type ~ "{" ~ stmt* ~ "}" }
+func       =  { "fn " ~ id ~ "(" ~ ")" ~ "->" ~ type ~ block }
 struct     =  { "struct " ~ id ~ "{" ~ structbd? ~ "}" }
 structbd   =  { id ~ ":" ~ type ~ ("," ~ id ~ ":" ~ type)* ~ ","? }
 const      =  { "const " ~ id ~ ":" ~ type ~ "=" ~ expr ~ ";" }
 type       =  { "i32" | "u8" | "char" | "bool" | "string" | id }
 alpha      =  { 'a'..'z' | 'A'..'Z' | "_" }
 digit      =  { '0'..'9' }
-stmt       =  {
-    expr ~ ";"
-  | "return " ~ expr ~ ";"
+block      =  { "{" ~ stmt* ~ "}" }
+stmt       = _{
+    expr_stmt
+  | ret_stmt
 }
+expr_stmt  =  { expr ~ ";" }
+ret_stmt   =  { "return " ~ expr ~ ";" }
 expr       =  {
   //   num ~ "+" ~ num
   // | num ~ "-" ~ num

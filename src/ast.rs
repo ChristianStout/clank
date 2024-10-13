@@ -1,3 +1,6 @@
+// A possible simple refactor is to convert
+// String to Box<str> or Rc<str>
+
 #[allow(dead_code)]
 #[derive(Debug)]
 pub enum Type {
@@ -98,9 +101,5 @@ pub enum TopLevel {
         Box<Type>, // Type
     ),
     Import(String),
-    Const(
-        String,
-        Box<Type>,
-        Box<Expr>,
-    ),
+    Const(String, Box<Type>, Box<Expr>),
 }
