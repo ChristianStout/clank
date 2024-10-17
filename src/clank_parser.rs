@@ -106,9 +106,9 @@ impl ClankParser {
                     println!("from expr: {}", pair.as_str());
                     expr = self.parse_unary(pair)
                 }
-                Rule::id => { expr = Expr::Id(pair.as_str().to_string()) },
-                Rule::num => { expr = Expr::Num(pair.as_str().parse::<i32>().expect("Somehow, a number was parsed, but it isn't a number")) }
-                Rule::string => { expr = Expr::Str(pair.into_inner().next().unwrap().as_str().to_string()) }
+                //Rule::id => { expr = Expr::Id(pair.as_str().to_string()) },
+                //Rule::num => { expr = Expr::Num(pair.as_str().parse::<i32>().expect("Somehow, a number was parsed, but it isn't a number")) }
+                //Rule::string => { expr = Expr::Str(pair.into_inner().next().unwrap().as_str().to_string()) }
                 Rule::char => {
                     let char_vec: Vec<char> =
                         pair.into_inner().next().unwrap().as_str().chars().collect();
@@ -122,6 +122,7 @@ impl ClankParser {
                 }
                 _ => {
                     println!("`{}` was unreachable in parse_expr", pair.as_str());
+                    println!("Token: {:?}", pair);
                     unreachable!();
                 }
             }
