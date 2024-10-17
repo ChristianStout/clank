@@ -54,7 +54,7 @@ terminal_e = _{
   | num
 }
 id         = @{ alpha ~ (alpha | digit)* }
-num        = @{ digit* }
+num        = @{ digit+ }
 string     = ${ "\"" ~ inner ~ "\"" }
 inner      = @{ inner_char* }
 char       = ${ "'" ~ inner_char ~ "'" }
