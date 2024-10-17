@@ -5,3 +5,5 @@ fn new() -> i32 {
     "Hello";
     return 42;
 }
+const E: i32 = +2;
+

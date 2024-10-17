@@ -19,24 +19,36 @@ stmt       = _{
 expr_stmt  =  { expr ~ ";" }
 ret_stmt   =  { "return " ~ expr ~ ";" }
 expr       =  {
-  //   num ~ "+" ~ num
-  // | num ~ "-" ~ num
-  // | num ~ "*" ~ num
-  // | num ~ "/" ~ num
-  // | num ~ "%" ~ num
-  // | num ~ "+=" ~ num
-  // | num ~ "-=" ~ num
-  // | num ~ "*=" ~ num
-  // | num ~ "/=" ~ num
-  // | num ~ "%=" ~ num
-  // | num ~ "==" ~ num
-  // | num ~ "!=" ~ num
-  // | num ~ ">" ~ num
-  // | num ~ "<" ~ num
-  // | num ~ ">=" ~ num
-  // | num ~ "<=" ~ num
-  // | num ~ "=" ~ num
-  | string
+    binary_e
+  | unary_e
+  | terminal_e
+}
+binary_e   =  {
+    terminal_e ~ "+" ~ expr
+  | terminal_e ~ "-" ~ expr
+  | terminal_e ~ "*" ~ expr
+  | terminal_e ~ "/" ~ expr
+  | terminal_e ~ "%" ~ expr
+  | terminal_e ~ "+=" ~ expr
+  | terminal_e ~ "-=" ~ expr
+  | terminal_e ~ "*=" ~ expr
+  | terminal_e ~ "/=" ~ expr
+  | terminal_e ~ "%=" ~ expr
+  | terminal_e ~ "==" ~ expr
+  | terminal_e ~ "!=" ~ expr
+  | terminal_e ~ ">" ~ expr
+  | terminal_e ~ "<" ~ expr
+  | terminal_e ~ ">=" ~ expr
+  | terminal_e ~ "<=" ~ expr
+  | terminal_e ~ "=" ~ expr
+}
+unary_e    =  { 
+      "+" ~ expr
+    | "-" ~ expr
+    | "!" ~ expr
+}
+terminal_e = _{
+    string
   | char
   | id
   | num

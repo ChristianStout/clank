@@ -31,6 +31,7 @@ impl ClankParser {
                         self.tree.push(c);
                     }
                     _ => {
+                        println!("`{}` was unreachable in build_parse_tree", item.as_str());
                         unreachable!();
                     }
                 }
@@ -73,6 +74,19 @@ impl ClankParser {
         return TopLevel::Const(id, t, expr);
     }
 
+    pub fn parse_unary(&self, p: Pair<'_, Rule>) -> Expr {
+        let symbol: char = p.as_str().chars().collect::<Vec<char>>()[0];
+
+        let expr = Box::new(self.parse_expr(p.into_inner()));
+        println!("{}", symbol);
+        match symbol {
+            '+' => { return Expr::UnaryPos(expr); }
+            '-' => { return Expr::UnaryNeg(expr); }
+            '!' => { return Expr::Not(expr); }
+            _   => { return Expr::Str("PARSE_UNARY_FAILED".to_string()); }
+        }
+    }
+
     pub fn parse_expr(&self, p: Pairs<'_, Rule>) -> Expr {
         let mut expr: Expr = Expr::False;
         for pair in p.into_iter() {
@@ -88,6 +102,13 @@ impl ClankParser {
                 Rule::string => {
                     expr = Expr::Str(pair.into_inner().next().unwrap().as_str().to_string())
                 }
+                Rule::unary_e => {
+                    println!("from expr: {}", pair.as_str());
+                    expr = self.parse_unary(pair)
+                }
+                Rule::id => { expr = Expr::Id(pair.as_str().to_string()) },
+                Rule::num => { expr = Expr::Num(pair.as_str().parse::<i32>().expect("Somehow, a number was parsed, but it isn't a number")) }
+                Rule::string => { expr = Expr::Str(pair.into_inner().next().unwrap().as_str().to_string()) }
                 Rule::char => {
                     let char_vec: Vec<char> =
                         pair.into_inner().next().unwrap().as_str().chars().collect();
@@ -99,7 +120,10 @@ impl ClankParser {
                 Rule::expr => {
                     return self.parse_expr(pair.into_inner()); // very hacky, make sure to otimize CALLS. Should remove
                 }
-                _ => unreachable!(),
+                _ => {
+                    println!("`{}` was unreachable in parse_expr", pair.as_str());
+                    unreachable!();
+                }
             }
         }
 

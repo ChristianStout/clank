@@ -1,0 +1,28 @@
+import os;
+
+@target-windows
+fn clear() {
+    os.execute("clr")
+}
+
+@target-default // all other systems are unix systems
+fn clear() {
+    os.execute("clear")
+}
+
+timer(duration: u32) {
+    for i in duration=..0 {
+        print(i);
+        clear();
+    }
+}
+
+fn main() {
+    let duration = input("How long would you like a timer?")
+        .to_u32()
+        .execpt("That was not a number, or you tried to reverse time");
+
+    
+    timer(duration);
+}
+
