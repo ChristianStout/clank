@@ -39,14 +39,43 @@ impl ClankParser {
         }
     }
 
-    pub fn parse_fn(&mut self, p: Pairs<'_, Rule>) -> TopLevel {
-        let mut pairs: Vec<Pair<'_, Rule>> = p.collect();
-
+    pub fn parse_fn(&self, p: Pairs<'_, Rule>) -> TopLevel {
+        let pairs: Vec<Pair<'_, Rule>> = p.collect();
+        
         let id = pairs[0].as_str().to_string();
-        let t = Box::new(self.get_type(pairs[1].as_str()));
-        let stmts = self.parse_stmt_many(pairs[2].clone().into_inner()); // TODO: revome clone
+        
+        let mut index = 1;
+        let mut parameters = vec![];
 
-        return TopLevel::Fn(id, vec![], t, stmts); // TODO: Add parameters
+        if let Rule::params = pairs[index].as_rule() {
+            parameters = self.parse_params(pairs[index].clone().into_inner());
+            index += 1;
+        }
+
+        let t = Box::new(self.get_type(pairs[index].as_str()));
+
+        let stmts = self.parse_stmt_many(pairs[index].clone().into_inner()); // TODO: revome clone
+
+        return TopLevel::Fn(id, parameters, t, stmts); // TODO: Add parameters
+    }
+
+    pub fn parse_params(&self, p: Pairs<'_, Rule>) -> Vec<(String, Type)> {
+        let mut parameters = Vec::new();
+        let pairs: Vec<Pair<'_, Rule>> = p.collect();
+
+        // pairs looks like [id, type, id, type, id, type, ...]
+        let mut index = 0;
+
+        while index < pairs.len() {
+            let id = String::from(pairs[index].as_str());
+            index += 1;
+            let t = self.get_type(pairs[index].as_str());
+            index += 1;
+
+            parameters.push((id, t));
+        }
+
+        return parameters;
     }
 
     pub fn parse_struct(&mut self, _p: Pairs<'_, Rule>) -> TopLevel {
@@ -147,6 +176,7 @@ impl ClankParser {
 
     pub fn parse_stmt_many(&self, stmts: Pairs<'_, Rule>) -> Vec<Stmt> {
         let mut ret_vec: Vec<Stmt> = vec![];
+        println!("from parse_stmts_many: {:?}", stmts);
         for stmt in stmts.into_iter() {
             ret_vec.push(self.parse_stmt(stmt));
 

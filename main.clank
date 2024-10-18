@@ -1,9 +1,6 @@
 
-const PI: i32 = 3;
 
-fn new() -> i32 {
-    "Hello";
+fn new(x: i32, y: i32) -> i32 {
     return 42;
 }
-const E: i32 = +2;
 
