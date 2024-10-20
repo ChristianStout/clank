@@ -54,7 +54,7 @@ impl ClankParser {
 
         let t = Box::new(self.get_type(pairs[index].as_str()));
         index += 1;
-        let stmts = self.parse_stmt_many(pairs[index].clone().into_inner()); // TODO: revome clone
+        let stmts = self.parse_stmt_block(pairs[index].clone().into_inner()); // TODO: revome clone
 
         return TopLevel::Fn(id, parameters, t, stmts); // TODO: Add parameters
     }
@@ -186,7 +186,7 @@ impl ClankParser {
         return Stmt::Expr(Box::new(Expr::False));
     }
 
-    pub fn parse_stmt_many(&self, stmts: Pairs<'_, Rule>) -> Vec<Stmt> {
+    pub fn parse_stmt_block(&self, stmts: Pairs<'_, Rule>) -> Vec<Stmt> {
         let mut ret_vec: Vec<Stmt> = vec![];
         println!("from parse_stmts_many: {:?}", stmts);
         for stmt in stmts.into_iter() {
