@@ -41,9 +41,9 @@ impl ClankParser {
 
     pub fn parse_fn(&self, p: Pairs<'_, Rule>) -> TopLevel {
         let pairs: Vec<Pair<'_, Rule>> = p.collect();
-        
+
         let id = pairs[0].as_str().to_string();
-        
+
         let mut index = 1;
         let mut parameters = vec![];
 
@@ -53,7 +53,7 @@ impl ClankParser {
         }
 
         let t = Box::new(self.get_type(pairs[index].as_str()));
-
+        index += 1;
         let stmts = self.parse_stmt_many(pairs[index].clone().into_inner()); // TODO: revome clone
 
         return TopLevel::Fn(id, parameters, t, stmts); // TODO: Add parameters
@@ -109,15 +109,24 @@ impl ClankParser {
         let expr = Box::new(self.parse_expr(p.into_inner()));
         println!("{}", symbol);
         match symbol {
-            '+' => { return Expr::UnaryPos(expr); }
-            '-' => { return Expr::UnaryNeg(expr); }
-            '!' => { return Expr::Not(expr); }
-            _   => { return Expr::Str("PARSE_UNARY_FAILED".to_string()); }
+            '+' => {
+                return Expr::UnaryPos(expr);
+            }
+            '-' => {
+                return Expr::UnaryNeg(expr);
+            }
+            '!' => {
+                return Expr::Not(expr);
+            }
+            _ => {
+                return Expr::Str("PARSE_UNARY_FAILED".to_string());
+            }
         }
     }
 
     pub fn parse_expr(&self, p: Pairs<'_, Rule>) -> Expr {
         let mut expr: Expr = Expr::False;
+        println!("from parse_expr(): {:?}", p);
         for pair in p.into_iter() {
             match pair.as_rule() {
                 Rule::id => expr = Expr::Id(pair.as_str().to_string()),
@@ -161,13 +170,16 @@ impl ClankParser {
     }
 
     pub fn parse_stmt(&self, stmt: Pair<'_, Rule>) -> Stmt {
-        println!("\n\n{:?}", stmt);
+        println!("\n\nfrom parse_stmt(): {:?}", stmt);
         match stmt.as_rule() {
             Rule::expr_stmt => {
                 return Stmt::Expr(Box::new(self.parse_expr(stmt.into_inner())));
             }
             Rule::ret_stmt => {
                 return Stmt::Return(Box::new(self.parse_expr(stmt.into_inner())));
+            }
+            Rule::expr => {
+                return Stmt::Expr(Box::new(self.parse_expr(stmt.into_inner())));
             }
             _ => {}
         }
@@ -209,3 +221,54 @@ pub fn parse_clank(input: String) -> Vec<TopLevel> {
 
     return clank_parser.tree;
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{Expr, TopLevel, Type, Stmt, parse_clank};
+
+    #[test]
+    fn test_parse_const() {
+        let input = "const APPLE: string = \"apple :)\";".to_string();
+        let a_tree: Vec<TopLevel> = vec![TopLevel::Const(
+            "APPLE".to_string(),
+            Box::new(Type::String),
+            Box::new(Expr::Str("apple :)".to_string()))
+        )];
+
+        let b_tree = parse_clank(input);
+
+        println!{"\n\na_tree: {:?}\n", a_tree}
+        println!{"b_tree: {:?}\n\n", b_tree}
+
+        assert_eq!(a_tree, b_tree);
+    }
+
+    #[test]
+        fn test_parse_func() {
+            let input = "
+                fn hi_there() -> i32 {
+                    return 0;
+                }".to_string();
+            let a_tree: Vec<TopLevel> = vec![TopLevel::Fn(
+                "hi_there".to_string(),
+                vec![],
+                Box::new(Type::I32),
+                vec![Stmt::Return(Box::new(Expr::Num(0)))]
+            )];
+
+            let b_tree = parse_clank(input);
+
+            println!{"\n\na_tree: {:?}\n", a_tree}
+            println!{"b_tree: {:?}\n\n", b_tree}
+
+            assert_eq!(a_tree, b_tree);
+        }
+}
+
+// [top_level(2, 46,
+//     [func(2, 46, [id(5, 8), type(14, 17),
+//         expr_stmt(24, 29, [
+//                 expr(24, 28, [
+//                     string(24, 28, [inner(25, 27)])])]),
+//         ret_stmt(34, 44,
+//             [expr(41, 43, [num(41, 43)])])])]), EOI(47, 47)]

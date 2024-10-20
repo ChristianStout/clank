@@ -2,7 +2,7 @@
 // String to Box<str> or Rc<str>
 
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Type {
     I32,
     U8,
@@ -15,7 +15,7 @@ pub enum Type {
 }
 
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Stmt {
     Expr(Box<Expr>),
     If(
@@ -46,7 +46,7 @@ pub enum Stmt {
 }
 
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Expr {
     Add(Box<Expr>, Box<Expr>),
     Sub(Box<Expr>, Box<Expr>),
@@ -84,7 +84,7 @@ pub enum Expr {
 }
 
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum TopLevel {
     Fn(
         String,              // Id

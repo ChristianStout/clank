@@ -1,6 +1,6 @@
 
 
-fn new(x: i32, y: i32) -> i32 {
+fn new() -> i32 {
+    "HI";
     return 42;
 }
-
