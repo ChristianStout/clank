@@ -89,16 +89,12 @@ pub enum TopLevel {
     Fn(
         String,              // Id
         Vec<(String, Type)>, // Params
-        Box<Type>,           // Type
+        Option<Type>,           // Type
         Vec<Stmt>,           // Stmt(s)
     ),
     Struct(
         String,              // Id
         Vec<(String, Type)>, // StructItem
-    ),
-    StructItem(
-        String,    // Id
-        Box<Type>, // Type
     ),
     Import(String),
     Const(String, Box<Type>, Box<Expr>),

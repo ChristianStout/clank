@@ -1,6 +1,4 @@
 
+fn main() {
 
-fn new() -> i32 {
-    "HI";
-    return 42;
 }

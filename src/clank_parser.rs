@@ -51,9 +51,11 @@ impl ClankParser {
             parameters = self.parse_params(pairs[index].clone().into_inner());
             index += 1;
         }
-
-        let t = Box::new(self.get_type(pairs[index].as_str()));
-        index += 1;
+        let mut t: Option<Type> = None;
+        if let Rule::r#type = pairs[index].as_rule() {
+            t = Some(self.get_type(pairs[index].as_str()));
+            index += 1;
+        }
         let stmts = self.parse_stmt_block(pairs[index].clone().into_inner()); // TODO: revome clone
 
         return TopLevel::Fn(id, parameters, t, stmts); // TODO: Add parameters
@@ -78,12 +80,44 @@ impl ClankParser {
         return parameters;
     }
 
-    pub fn parse_struct(&mut self, _p: Pairs<'_, Rule>) -> TopLevel {
-        return TopLevel::Const(
-            String::from("from parse_struct"),
-            Box::new(Type::I32),
-            Box::new(Expr::False),
-        );
+    pub fn parse_struct(&mut self, mut p: Pairs<'_, Rule>) -> TopLevel {
+        let name = p
+            .next()
+            .unwrap()
+            .as_str()
+            .to_string();
+
+        let body = if let Some(pair) = p.next() {
+            self.parse_struct_body(pair.into_inner())
+        } else {
+            vec![]
+        };
+
+        return TopLevel::Struct(name, body);
+    }
+
+    pub fn parse_struct_body(&self, mut p: Pairs<'_, Rule>) -> Vec<(String, Type)> {
+        println!("{:?}", p);
+
+        let mut body = vec![];
+
+        let name0 = p.next().unwrap().as_str().to_string();
+        let type0 = self.get_type(p.next().unwrap().as_str());
+
+        body.push((name0, type0));
+
+        #[allow(while_true)]
+        while true {
+            if let Some(next) = p.next() {
+                let name = next.as_str().to_string();
+                let t = self.get_type(p.next().unwrap().as_str());
+                body.push((name, t));
+            }
+
+            else {break;}
+        }
+
+        return body;
     }
 
     pub fn parse_const(&mut self, p: Pairs<'_, Rule>) -> TopLevel {
@@ -107,7 +141,6 @@ impl ClankParser {
         let symbol: char = p.as_str().chars().collect::<Vec<char>>()[0];
 
         let expr = Box::new(self.parse_expr(p.into_inner()));
-        println!("{}", symbol);
         match symbol {
             '+' => {
                 return Expr::UnaryPos(expr);
@@ -126,7 +159,6 @@ impl ClankParser {
 
     pub fn parse_expr(&self, p: Pairs<'_, Rule>) -> Expr {
         let mut expr: Expr = Expr::False;
-        println!("from parse_expr(): {:?}", p);
         for pair in p.into_iter() {
             match pair.as_rule() {
                 Rule::id => expr = Expr::Id(pair.as_str().to_string()),
@@ -141,7 +173,6 @@ impl ClankParser {
                     expr = Expr::Str(pair.into_inner().next().unwrap().as_str().to_string())
                 }
                 Rule::unary_e => {
-                    println!("from expr: {}", pair.as_str());
                     expr = self.parse_unary(pair)
                 }
                 //Rule::id => { expr = Expr::Id(pair.as_str().to_string()) },
@@ -170,7 +201,6 @@ impl ClankParser {
     }
 
     pub fn parse_stmt(&self, stmt: Pair<'_, Rule>) -> Stmt {
-        println!("\n\nfrom parse_stmt(): {:?}", stmt);
         match stmt.as_rule() {
             Rule::expr_stmt => {
                 return Stmt::Expr(Box::new(self.parse_expr(stmt.into_inner())));
@@ -244,31 +274,121 @@ mod tests {
     }
 
     #[test]
-        fn test_parse_func() {
+        fn test_parse_fn() {
             let input = "
                 fn hi_there() -> i32 {
                     return 0;
-                }".to_string();
+                }
+                ".to_string();
             let a_tree: Vec<TopLevel> = vec![TopLevel::Fn(
                 "hi_there".to_string(),
                 vec![],
-                Box::new(Type::I32),
+                Some(Type::I32),
                 vec![Stmt::Return(Box::new(Expr::Num(0)))]
             )];
 
             let b_tree = parse_clank(input);
 
-            println!{"\n\na_tree: {:?}\n", a_tree}
-            println!{"b_tree: {:?}\n\n", b_tree}
+            assert_eq!(a_tree, b_tree);
+        }
+
+        #[test]
+        fn test_parse_fn_no_return_type() {
+            let input = "
+                fn hello_there() {
+                    return 0;
+                }
+                ".to_string();
+            let a_tree: Vec<TopLevel> = vec![TopLevel::Fn(
+                "hello_there".to_string(),
+                vec![],
+                None,
+                vec![Stmt::Return(Box::new(Expr::Num(0)))]
+            )];
+
+            let b_tree = parse_clank(input);
+
+            assert_eq!(a_tree, b_tree);
+        }
+
+        #[test]
+        fn test_parse_empty_struct() {
+            let input = "
+                struct HiThere {}
+                struct Okay;
+                ".to_string();
+            let a_tree: Vec<TopLevel> = vec![
+                TopLevel::Struct(
+                    "HiThere".to_string(),
+                    vec![],
+                ),
+                TopLevel::Struct(
+                        "Okay".to_string(),
+                        vec![],
+                ),
+            ];
+
+            let b_tree = parse_clank(input);
+
+            assert_eq!(a_tree, b_tree);
+        }
+
+        #[test]
+        fn test_parse_struct_one_item() {
+            let input = "
+                struct HiThere {
+                    x: i32
+                }
+                ".to_string();
+            let a_tree: Vec<TopLevel> = vec![TopLevel::Struct(
+                "HiThere".to_string(),
+                vec![("x".to_string(), Type::I32)],
+            )];
+
+            let b_tree = parse_clank(input);
+
+            assert_eq!(a_tree, b_tree);
+        }
+
+        #[test]
+        fn test_parse_struct_two_items() {
+            let input = "
+                struct HiThere {
+                    x: i32,
+                    y: i32
+                }
+                ".to_string();
+            let a_tree: Vec<TopLevel> = vec![TopLevel::Struct(
+                "HiThere".to_string(),
+                vec![
+                    ("x".to_string(), Type::I32),
+                    ("y".to_string(), Type::I32),
+                ],
+            )];
+
+            let b_tree = parse_clank(input);
+
+            assert_eq!(a_tree, b_tree);
+        }
+
+        #[test]
+        fn test_parse_struct_leading_comma() {
+            let input = "
+                struct HiThere {
+                    x: i32,
+                    y: i32,
+                }
+                ".to_string();
+            let a_tree: Vec<TopLevel> = vec![TopLevel::Struct(
+                "HiThere".to_string(),
+                vec![
+                    ("x".to_string(), Type::I32),
+                    ("y".to_string(), Type::I32),
+                ],
+            )];
+
+            let b_tree = parse_clank(input);
 
             assert_eq!(a_tree, b_tree);
         }
 }
-
-// [top_level(2, 46,
-//     [func(2, 46, [id(5, 8), type(14, 17),
-//         expr_stmt(24, 29, [
-//                 expr(24, 28, [
-//                     string(24, 28, [inner(25, 27)])])]),
-//         ret_stmt(34, 44,
-//             [expr(41, 43, [num(41, 43)])])])]), EOI(47, 47)]

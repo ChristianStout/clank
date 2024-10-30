@@ -9,7 +9,7 @@ S       := <import>
          | <trait>
 import  := import <id> (::<id>)* (as <id>)? ;
 const   := const <id> : <type> = <expr> ;
-func    := fn <id> ( <params>? ) -> <type> { <stmt>* }
+func    := fn <id> ( <params>? ) (-> <type>)? { <stmt>* }
 struct  := struct <id> { <objdef> }
 enum    := enum <id> { <enmitm> (, <enmitm>)* [,]? }
 impl    := impl <id>  (for <id>)? { <func>* }
