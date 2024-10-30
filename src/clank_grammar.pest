@@ -3,12 +3,14 @@ top_level  =  {
     func
   | struct
   | const
+  | import
 }
 func       =  { "fn " ~ id ~ "(" ~ params? ~ ")" ~ ("->" ~ type)? ~ block }
 params     =  { id ~ ":" ~ type ~ ("," ~ id ~ ":" ~ type)* }
 struct     =  { "struct " ~ id ~ ("{" ~ structbd? ~ "}" | ";") }
 structbd   =  { id ~ ":" ~ type ~ ("," ~ id ~ ":" ~ type)* ~ ","? }
 const      =  { "const " ~ id ~ ":" ~ type ~ "=" ~ expr ~ ";" }
+import     =  { "import " ~ id ~ ";" }
 type       =  { "i32" | "u8" | "char" | "bool" | "string" | id }
 alpha      =  { 'a'..'z' | 'A'..'Z' | "_" }
 digit      =  { '0'..'9' }

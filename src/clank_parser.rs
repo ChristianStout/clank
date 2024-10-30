@@ -30,6 +30,10 @@ impl ClankParser {
                         let c = self.parse_const(item.into_inner());
                         self.tree.push(c);
                     }
+                    Rule::import => {
+                        let i = self.parse_import(item.into_inner());
+                        self.tree.push(i);
+                    }
                     _ => {
                         println!("`{}` was unreachable in build_parse_tree", item.as_str());
                         unreachable!();
@@ -56,6 +60,7 @@ impl ClankParser {
             t = Some(self.get_type(pairs[index].as_str()));
             index += 1;
         }
+
         let stmts = self.parse_stmt_block(pairs[index].clone().into_inner()); // TODO: revome clone
 
         return TopLevel::Fn(id, parameters, t, stmts); // TODO: Add parameters
@@ -135,6 +140,12 @@ impl ClankParser {
         );
 
         return TopLevel::Const(id, t, expr);
+    }
+
+    pub fn parse_import(&mut self, mut p: Pairs<'_, Rule>) -> TopLevel {
+        let id = p.next().unwrap().as_str().to_string();
+
+        return TopLevel::Import(id);
     }
 
     pub fn parse_unary(&self, p: Pair<'_, Rule>) -> Expr {
@@ -386,6 +397,22 @@ mod tests {
                     ("y".to_string(), Type::I32),
                 ],
             )];
+
+            let b_tree = parse_clank(input);
+
+            assert_eq!(a_tree, b_tree);
+        }
+
+        #[test]
+        fn test_parse_import() {
+            let input = "
+                import math;
+                import the_usual;
+                ".to_string();
+            let a_tree: Vec<TopLevel> = vec![
+                TopLevel::Import("math".to_string()),
+                TopLevel::Import("the_usual".to_string()),
+            ];
 
             let b_tree = parse_clank(input);
 
