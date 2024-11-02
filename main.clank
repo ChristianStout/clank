@@ -1,5 +1,8 @@
 import math;
 
 fn main() {
-
+    if !true {
+        2;
+        22233;
+    }
 }

@@ -153,18 +153,18 @@ impl ClankParser {
 
         let expr = Box::new(self.parse_expr(p.into_inner()));
         match symbol {
-            '+' => {
-                return Expr::UnaryPos(expr);
-            }
-            '-' => {
-                return Expr::UnaryNeg(expr);
-            }
-            '!' => {
-                return Expr::Not(expr);
-            }
-            _ => {
-                return Expr::Str("PARSE_UNARY_FAILED".to_string());
-            }
+            '+' => Expr::UnaryPos(expr),
+            '-' => Expr::UnaryNeg(expr),
+            '!' => Expr::Not(expr),
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn parse_boolean_expr(&self, p: Pair<'_, Rule>) -> Expr {
+        match p.as_str() {
+            "true" => Expr::True,
+            "false" => Expr::False,
+            _ => unreachable!()
         }
     }
 
@@ -178,13 +178,19 @@ impl ClankParser {
                         pair.as_str()
                             .parse::<i32>()
                             .expect("Somehow, a number was parsed, but it isn't a number"),
-                    )
+                    );
                 }
                 Rule::string => {
-                    expr = Expr::Str(pair.into_inner().next().unwrap().as_str().to_string())
+                    expr = Expr::Str(pair.into_inner().next().unwrap().as_str().to_string());
                 }
+                // Rule::binary_e => {
+                //     expr = self.parse_binary(pair);
+                // }
                 Rule::unary_e => {
-                    expr = self.parse_unary(pair)
+                    expr = self.parse_unary(pair);
+                }
+                Rule::boolean_e => {
+                    expr = self.parse_boolean_expr(pair);
                 }
                 //Rule::id => { expr = Expr::Id(pair.as_str().to_string()) },
                 //Rule::num => { expr = Expr::Num(pair.as_str().parse::<i32>().expect("Somehow, a number was parsed, but it isn't a number")) }
@@ -219,12 +225,26 @@ impl ClankParser {
             Rule::ret_stmt => {
                 return Stmt::Return(Box::new(self.parse_expr(stmt.into_inner())));
             }
+            Rule::if_stmt => {
+                return self.parse_if_stmt(stmt.into_inner());
+            }
             Rule::expr => {
                 return Stmt::Expr(Box::new(self.parse_expr(stmt.into_inner())));
             }
             _ => {}
         }
         return Stmt::Expr(Box::new(Expr::False));
+    }
+
+    pub fn parse_if_stmt(&self, mut stmt: Pairs<'_, Rule>) -> Stmt {
+        let expr = self.parse_expr(stmt.next().unwrap().into_inner());
+
+        let mut block = vec![];
+        if let Some(statements) = stmt.next() {
+            block = self.parse_stmt_block(statements.into_inner());
+        };
+
+        return Stmt::If(Box::new(expr), block);
     }
 
     pub fn parse_stmt_block(&self, stmts: Pairs<'_, Rule>) -> Vec<Stmt> {
@@ -417,5 +437,38 @@ mod tests {
             let b_tree = parse_clank(input);
 
             assert_eq!(a_tree, b_tree);
+        }
+
+        #[test]
+        fn test_parse_if() {
+            let input = r#"
+                    fn main() {
+                        if true {
+                            22; "hi";
+                        }
+                        if false {}
+                    }
+                    "#.to_string();
+                let a_tree: Vec<TopLevel> = vec![
+                    TopLevel::Fn(
+                        "main".to_string(), vec![], None,
+                        vec![
+                            Stmt::If(
+                                Box::new(Expr::True),
+                                vec![
+                                    Stmt::Expr(Box::new(Expr::Num(22))),
+                                    Stmt::Expr(Box::new(Expr::Str("hi".to_string())))
+                                ]
+                            ),
+                            Stmt::If(
+                                Box::new(Expr::False),
+                                vec![]
+                            )
+                        ]),
+                ];
+
+                let b_tree = parse_clank(input);
+
+                assert_eq!(a_tree, b_tree);
         }
 }
